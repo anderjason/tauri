@@ -94,7 +94,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     .hidden_title(true)
     .decorations(true)
     .visible(false)
-    .inner_size(900.0, 700.0)
+    .inner_size(720.0, 520.0)
     .traffic_light_position(LogicalPosition::new(REQUESTED_X, REQUESTED_Y))
     .build()?;
 
@@ -128,13 +128,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
   );
 
   let initial_size = window.inner_size()?;
-  window.set_size(LogicalSize::new(1100.0, 760.0))?;
+  thread::sleep(Duration::from_secs(1));
+  window.set_size(LogicalSize::new(1260.0, 840.0))?;
 
   wait_until(&mut app, Duration::from_secs(5), || {
     let size = window.inner_size()?;
     let positions = traffic_light_positions(&window)?;
     Ok(size != initial_size && approx_eq(positions.close_x, REQUESTED_X))
   })?;
+
+  thread::sleep(Duration::from_secs(1));
 
   let resized_positions = traffic_light_positions(&window)?;
   assert!(
