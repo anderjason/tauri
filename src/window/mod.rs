@@ -50,13 +50,11 @@ use tauri_macros::default_runtime;
 
 use std::{
   fmt,
-  #[cfg(target_os = "macos")]
-  fs::OpenOptions,
   hash::{Hash, Hasher},
-  #[cfg(target_os = "macos")]
-  io::Write,
   sync::{Arc, Mutex, MutexGuard},
 };
+#[cfg(target_os = "macos")]
+use std::{fs::OpenOptions, io::Write};
 
 #[cfg(target_os = "macos")]
 const TRAFFIC_LIGHT_LOG_PATH: &str = "/tmp/listen-traffic-lights.log";
