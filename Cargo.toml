@@ -63,6 +63,10 @@ targets = [
 
 [workspace]
 
+[patch.crates-io]
+tao = { path = "../tao" }
+wry = { path = "../wry" }
+
 [package.metadata.cargo-udeps.ignore]
 normal = ["reqwest"]
 build = ["tauri-build"]

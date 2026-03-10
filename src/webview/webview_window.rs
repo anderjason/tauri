@@ -6,8 +6,6 @@
 
 use std::{
   borrow::Cow,
-  fs::OpenOptions,
-  io::Write,
   path::{Path, PathBuf},
   sync::{Arc, MutexGuard},
 };
@@ -49,20 +47,6 @@ use tauri_macros::default_runtime;
 use windows::Win32::Foundation::HWND;
 
 use super::{DownloadEvent, ResolvedScope};
-
-#[cfg(target_os = "macos")]
-const TRAFFIC_LIGHT_LOG_PATH: &str = "/tmp/listen-traffic-lights.log";
-
-#[cfg(target_os = "macos")]
-fn append_traffic_light_log_line(line: &str) {
-  if let Ok(mut file) = OpenOptions::new()
-    .create(true)
-    .append(true)
-    .open(TRAFFIC_LIGHT_LOG_PATH)
-  {
-    let _ = writeln!(file, "{line}");
-  }
-}
 
 /// A builder for [`WebviewWindow`], a window that hosts a single webview.
 pub struct WebviewWindowBuilder<'a, R: Runtime, M: Manager<R>> {
@@ -459,11 +443,6 @@ tauri::Builder::default()
 
   /// Creates a new window.
   pub fn build(self) -> crate::Result<WebviewWindow<R>> {
-    #[cfg(target_os = "macos")]
-    append_traffic_light_log_line(&format!(
-      "[tauri traffic-lights] FORK LOADED WebviewWindowBuilder::build label={}",
-      self.window_builder.label
-    ));
     let (window, webview) = self.window_builder.with_webview(self.webview_builder)?;
     Ok(WebviewWindow { window, webview })
   }
@@ -860,10 +839,6 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[must_use]
   pub fn traffic_light_position<P: Into<Position>>(mut self, position: P) -> Self {
     let position = position.into();
-    append_traffic_light_log_line(&format!(
-      "[tauri traffic-lights] WebviewWindowBuilder::traffic_light_position label={} position={position:?}",
-      self.window_builder.label
-    ));
     self.window_builder = self.window_builder.traffic_light_position(position);
     self.webview_builder.webview_attributes = self
       .webview_builder

@@ -53,22 +53,6 @@ use std::{
   hash::{Hash, Hasher},
   sync::{Arc, Mutex, MutexGuard},
 };
-#[cfg(target_os = "macos")]
-use std::{fs::OpenOptions, io::Write};
-
-#[cfg(target_os = "macos")]
-const TRAFFIC_LIGHT_LOG_PATH: &str = "/tmp/listen-traffic-lights.log";
-
-#[cfg(target_os = "macos")]
-fn append_traffic_light_log_line(line: &str) {
-  if let Ok(mut file) = OpenOptions::new()
-    .create(true)
-    .append(true)
-    .open(TRAFFIC_LIGHT_LOG_PATH)
-  {
-    let _ = writeln!(file, "{line}");
-  }
-}
 
 /// Monitor descriptor.
 #[derive(Debug, Clone, Serialize)]
@@ -879,11 +863,6 @@ impl<'a, R: Runtime, M: Manager<R>> WindowBuilder<'a, R, M> {
   #[cfg(target_os = "macos")]
   #[must_use]
   pub fn traffic_light_position<P: Into<Position>>(mut self, position: P) -> Self {
-    let position = position.into();
-    append_traffic_light_log_line(&format!(
-      "[tauri traffic-lights] WindowBuilder::traffic_light_position label={} position={position:?}",
-      self.label
-    ));
     self.window_builder = self.window_builder.traffic_light_position(position);
     self
   }

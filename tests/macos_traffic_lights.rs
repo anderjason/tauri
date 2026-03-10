@@ -19,7 +19,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
   };
 
   const REQUESTED_X: f64 = 120.0;
-  const REQUESTED_Y: f64 = 12.0;
+  const REQUESTED_Y: f64 = 40.0;
   const TOLERANCE: f64 = 0.5;
 
   #[derive(Clone, Copy, Debug)]
@@ -27,6 +27,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     close_x: f64,
     mini_x: f64,
     zoom_x: f64,
+    close_top_inset: f64,
+    mini_top_inset: f64,
+    zoom_top_inset: f64,
   }
 
   #[allow(deprecated)]
@@ -75,11 +78,22 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
       let zoom = ns_window
         .standardWindowButton(NSWindowButton::ZoomButton)
         .ok_or("missing zoom button")?;
+      let titlebar = close
+        .superview()
+        .and_then(|view| view.superview())
+        .ok_or("missing titlebar container")?;
+      let titlebar_height = NSView::frame(&titlebar).size.height;
+      let close_frame = NSView::frame(&close);
+      let mini_frame = NSView::frame(&mini);
+      let zoom_frame = NSView::frame(&zoom);
 
       Ok(TrafficLightPositions {
-        close_x: NSView::frame(&close).origin.x,
-        mini_x: NSView::frame(&mini).origin.x,
-        zoom_x: NSView::frame(&zoom).origin.x,
+        close_x: close_frame.origin.x,
+        mini_x: mini_frame.origin.x,
+        zoom_x: zoom_frame.origin.x,
+        close_top_inset: titlebar_height - close_frame.origin.y - close_frame.size.height,
+        mini_top_inset: titlebar_height - mini_frame.origin.y - mini_frame.size.height,
+        zoom_top_inset: titlebar_height - zoom_frame.origin.y - zoom_frame.size.height,
       })
     }
   }
@@ -126,6 +140,21 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     REQUESTED_X + 46.0,
     positions
   );
+  assert!(
+    approx_eq(positions.close_top_inset, REQUESTED_Y),
+    "expected close button top inset ~= {REQUESTED_Y}, got {:?}",
+    positions
+  );
+  assert!(
+    approx_eq(positions.mini_top_inset, REQUESTED_Y),
+    "expected miniaturize button top inset ~= {REQUESTED_Y}, got {:?}",
+    positions
+  );
+  assert!(
+    approx_eq(positions.zoom_top_inset, REQUESTED_Y),
+    "expected zoom button top inset ~= {REQUESTED_Y}, got {:?}",
+    positions
+  );
 
   let initial_size = window.inner_size()?;
   thread::sleep(Duration::from_secs(1));
@@ -155,6 +184,21 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     approx_eq(resized_positions.zoom_x, REQUESTED_X + 46.0),
     "expected zoom button x to stay ~= {} after resize, got {:?}",
     REQUESTED_X + 46.0,
+    resized_positions
+  );
+  assert!(
+    approx_eq(resized_positions.close_top_inset, REQUESTED_Y),
+    "expected close button top inset to stay ~= {REQUESTED_Y} after resize, got {:?}",
+    resized_positions
+  );
+  assert!(
+    approx_eq(resized_positions.mini_top_inset, REQUESTED_Y),
+    "expected miniaturize button top inset to stay ~= {REQUESTED_Y} after resize, got {:?}",
+    resized_positions
+  );
+  assert!(
+    approx_eq(resized_positions.zoom_top_inset, REQUESTED_Y),
+    "expected zoom button top inset to stay ~= {REQUESTED_Y} after resize, got {:?}",
     resized_positions
   );
 
