@@ -838,10 +838,15 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
   #[cfg(target_os = "macos")]
   #[must_use]
   pub fn traffic_light_position<P: Into<Position>>(mut self, position: P) -> Self {
+    let position = position.into();
+    // `WebviewWindow` can be hosted by the native window view hierarchy instead
+    // of a webview-owned content view, so both builders must receive the same
+    // inset on macOS.
+    self.window_builder = self.window_builder.traffic_light_position(position);
     self.webview_builder.webview_attributes = self
       .webview_builder
       .webview_attributes
-      .traffic_light_position(position.into());
+      .traffic_light_position(position);
     self
   }
 

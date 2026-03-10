@@ -41,6 +41,12 @@ normal = ["reqwest"]
 build = ["tauri-build"]
 development = ["quickcheck_macros"]
 
+[[test]]
+name = "macos_traffic_lights"
+path = "tests/macos_traffic_lights.rs"
+harness = false
+required-features = ["test"]
+
 [dependencies]
 serde_json = { version = "1", features = ["raw_value"] }
 serde = { version = "1", features = ["derive", "rc"] }
