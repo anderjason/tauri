@@ -864,6 +864,7 @@ impl<'a, R: Runtime, M: Manager<R>> WebviewWindowBuilder<'a, R, M> {
       "[tauri traffic-lights] WebviewWindowBuilder::traffic_light_position label={} position={position:?}",
       self.window_builder.label
     ));
+    self.window_builder = self.window_builder.traffic_light_position(position);
     self.webview_builder.webview_attributes = self
       .webview_builder
       .webview_attributes
