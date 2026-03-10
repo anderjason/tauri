@@ -61,6 +61,8 @@ targets = [
     "x86_64-apple-ios",
 ]
 
+[workspace]
+
 [package.metadata.cargo-udeps.ignore]
 normal = ["reqwest"]
 build = ["tauri-build"]
@@ -139,6 +141,12 @@ x11 = ["tauri-runtime-wry?/x11"]
 [lib]
 name = "tauri"
 path = "src/lib.rs"
+
+[[test]]
+name = "macos_traffic_lights"
+path = "tests/macos_traffic_lights.rs"
+harness = false
+required-features = ["test"]
 
 [dependencies.anyhow]
 version = "1"
